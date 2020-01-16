@@ -1,3 +1,9 @@
+/*
+오답노트
+1. 자음, 모음 조건 적용하지 않아서 오답
+2. 백트래킹 돌릴 때, 첫 문자를 주어진 문자 전체에서 돌리지 않고 앞의 일부만 돌려서 뒤의 정답들이 짤려서 오답
+*/
+
 #include <iostream>
 #include <vector>
 #include <algorithm>
