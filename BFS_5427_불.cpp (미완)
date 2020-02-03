@@ -9,19 +9,23 @@
 -1 : 벽
 0 : 아직 방문하지 않은 칸
 n : n 시간만에 방문 가능한 칸
+
+<시행착오>
+1. DFS로 풀려하니 최소경로 값 지정해주는 것이 불편 -> BFS로 전환
+2. 방문한 곳을 따로 체크해주지 않아 무한루프
+3. 각 Testcase가 끝난 후 초기화를 해주지 않아 이전 값이 남아있어 오류 야기
+
+<오답노트>
+메모리초과 : euqueue, dequeue를 너무 많이해서 나는 것으로 추정.
 */
 
 #include <iostream>
 #include <queue>
 #include <algorithm>
+#include <string.h>
 #include <string>
 
 using namespace std;
-
-struct Point {
-	int row;
-	int col;
-};
 
 int rowMax, colMax;
 int sMap[1000][1000][2];
@@ -29,35 +33,72 @@ int fireMap[1000][1000][2];
 int dx[4] = { 1, -1, 0, 0 };
 int dy[4] = { 0, 0, 1, -1 };
 queue <pair<pair<int, int>, int> >q;
+queue <pair<pair<int, int>, int> >fire_q;
 
-void sMapBfs(int row, int col, int count)
+void fireMapBfs()
 {
-	q.push(make_pair(make_pair(row, col), count));
+	int count = 0;
+
+	while (fire_q.size())
+	{
+		int currentRow = fire_q.front().first.first;
+		int currentCol = fire_q.front().first.second;
+		count = fire_q.front().second;
+		fire_q.pop();
+
+		fireMap[currentRow][currentCol][1] = 1;	// 방문했음을 표시한다.
+		fireMap[currentRow][currentCol][0] = count;	// 현재 위치에 올 수 있는 최소경로를 저장한다.
+
+		for (int i = 0; i < 4; i++)	// 현재 위치에서 움직일 수 있는 모든 경로를 enqueue
+		{
+			int nextRow = currentRow + dx[i];
+			int nextCol = currentCol + dy[i];
+
+			if (fireMap[nextRow][nextCol][1] == 1 || fireMap[nextRow][nextCol][0] == -1 || nextRow < 0 || nextRow >= rowMax || nextCol < 0 || nextCol >= colMax)
+				continue;
+
+			fire_q.push(make_pair(make_pair(nextRow, nextCol), count + 1));
+		}
+	}
+}
+
+void sMapBfs(int & result)
+{
+	int count = 0;
 
 	while (q.size())
 	{
-		int currentRow = q.front().first.first;			
+		int currentRow = q.front().first.first;
 		int currentCol = q.front().first.second;
 		count = q.front().second;
 		q.pop();
+		
+		if (currentRow == 0 || currentRow == rowMax - 1 || currentCol == 0 || currentCol == colMax - 1)	// 출구에 도착한 경우
+		{
+			if (fireMap[currentRow][currentCol][0] > count)
+			{
+				result = count;
+				return;
+			}
+		}
 
 		sMap[currentRow][currentCol][1] = 1;	// 방문했음을 표시한다.
-		sMap[currentRow][currentCol][0] = count++;	// 현재 위치에 올 수 있는 최소경로를 저장한다.
+		sMap[currentRow][currentCol][0] = count;	// 현재 위치에 올 수 있는 최소경로를 저장한다.
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 4; i++)	// 현재 위치에서 움직일 수 있는 모든 경로를 enqueue
 		{
-			int nextRow = row + dx[i];
-			int nextCol = col + dy[i];
+			int nextRow = currentRow + dx[i];
+			int nextCol = currentCol + dy[i];
 
-			if (sMap[nextRow][nextCol][1] == 1 || nextRow < 0 || nextRow >= rowMax || nextCol < 0 || nextCol >= colMax)
+			if (sMap[nextRow][nextCol][1] == 1 || sMap[nextRow][nextCol][0] == -1 || nextRow < 0 || nextRow >= rowMax || nextCol < 0 || nextCol >= colMax)
 				continue;
 
-			q.push(make_pair(make_pair(nextRow, nextCol), count));
+			q.push(make_pair(make_pair(nextRow, nextCol), count + 1));
 		}
 	}
-
-
 }
+
+
 
 int main()
 {
@@ -69,8 +110,9 @@ int main()
 
 	while (testNum)
 	{
+		int result = -1;
 		string input;
-		struct Point firePoint, startPoint;
+		//struct Point firePoint, startPoint;
 
 		cin >> colMax >> rowMax;
 
@@ -81,6 +123,9 @@ int main()
 
 			for (int j = 0; j < input.length(); j++)
 			{
+				sMap[i][j][1] = 0;
+				fireMap[i][j][1] = 0;
+
 				if (input[j] == '#')
 				{
 					sMap[i][j][0] = -1;
@@ -89,14 +134,16 @@ int main()
 
 				else if (input[j] == '*')
 				{
-					firePoint.row = i;
-					firePoint.col = j;
+					fire_q.push(make_pair(make_pair(i, j), 1));
+					sMap[i][j][0] = 0;
+					fireMap[i][j][0] = 0;
 				}
 
 				else if (input[j] == '@')
 				{
-					startPoint.row = i;
-					startPoint.col = j;
+					q.push(make_pair(make_pair(i, j), 1));
+					sMap[i][j][0] = 0;
+					fireMap[i][j][0] = 0;
 				}
 
 				else
@@ -108,16 +155,31 @@ int main()
 		}
 
 		// BFS
-		sMapBfs(startPoint.row, startPoint.col, 1);
+		fireMapBfs();
+		sMapBfs(result);
 
+		if (result == -1)
+			cout << "IMPOSSIBLE" << endl;
+		else
+			cout << result << endl;
+
+		/*
+		cout << "*****************************" << endl;
 		for (int i = 0; i < rowMax; i++)
 		{
 			for (int j = 0; j < colMax; j++)
 				cout << sMap[i][j][0] << " ";
 			cout << endl;
 		}
+		*/
 
-		// 가장자리 값들 비교해서 탈출 가능 여부 출력
+		while (q.size())
+			q.pop();
+
+		while (fire_q.size())
+			fire_q.pop();
+		
+		//cout << q.size() << " " << fire_q.size() << endl;
 
 		testNum--;
 	}
