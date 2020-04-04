@@ -1,5 +1,3 @@
-// 문제풀이 : 
-
 #include <iostream>
 #include <algorithm>
 
