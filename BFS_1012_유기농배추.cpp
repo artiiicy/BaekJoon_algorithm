@@ -4,7 +4,7 @@ BaekJoon #1012 유기농배추
 
 <Better>
 - check 2차원 배열을 따로 만들지 않고 graph에서 방문시 값을 0으로 바꾸면 재방문 하는것을 방지할 수 있다.
-- out of array 조건을 배열값으로 따로 만들면 더 드가 깔끔해진다
+- out of array 조건을 배열값으로 따로 만들면 코드가  깔끔해진다
 */
 
 #include <iostream>
