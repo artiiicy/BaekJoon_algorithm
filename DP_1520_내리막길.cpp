@@ -1,5 +1,5 @@
-//#1520 내리막길	#DP #다이나믹프로그래밍
 /*
+#1520 내리막길	#DP #다이나믹프로그래밍
 dynamic programming 문제.
 
 재귀, memoization 사용하여 top-down 방식으로 해결.
