@@ -4,7 +4,7 @@ BackJoon #1260 DFS와BFS
 
 
 <Better>
--check 배열을 dfs방문하고 bfs방문하기 전에 0으로 모두 초기화 할 필요 없이 dfs가 끝나면 check배열이 모두 1로 돼있으므로 bfs에서는 방문 후에 0으로 바꿔주도록 코딩할 수 있다.
+-check 배열을 dfs방문하고 bfs방문하기 전에 0으로 모두 초기화 할 필요 없이 dfs가 끝나면 check배열이 모두 1로 돼있으므로 bfs에서는 방문 후에 0으로 바꿔주도록 코딩할 수 있다
 -bfs에서 굳이 재귀를 쓰지 않고 queue를 이용하여 graph[q.front()][i] + q.pop() 으로 모든 노드 탐색 가능
 */
 
