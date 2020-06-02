@@ -77,7 +77,6 @@ int main()
 		}
 
 		ballArr[i].result = totalSum - currentSum - (totalSumOfBallSize[ballArr[i].color - 1] - currentSumOfBallSize[ballArr[i].color - 1][0]);
-
 		beforeSize = ballArr[i].size;
 	}
 
